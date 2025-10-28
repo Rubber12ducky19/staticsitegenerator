@@ -1,0 +1,40 @@
+import unittest
+from textnode import TextNode, TextType
+
+class TestTextNode(unittest.TestCase):
+    def test_equal(self):
+        print("TextNode 'Equals' Tests:")
+        node1 = TextNode("This is a text node", TextType.TEXT)
+        node2 = TextNode("This is a text node", TextType.TEXT)
+        self.assertEqual(node1, node2)
+        print("-Text: Passed")
+        node3 = TextNode("This is a bold node", TextType.BOLD)
+        node4 = TextNode("This is a bold node", TextType.BOLD)
+        self.assertEqual(node3,node4)
+        print("-Bold: Passed")
+        node5 = TextNode("This is a italic node", TextType.ITALIC)
+        node6 = TextNode("This is a italic node", TextType.ITALIC)
+        self.assertEqual(node5, node6)
+        print("-Italic: Passed")
+        node7 = TextNode("This is a code node", TextType.CODE)
+        node8 = TextNode("This is a code node", TextType.CODE)
+        self.assertEqual(node7,node8)
+        print("-Code: Passed")
+        node9 = TextNode("This is a link node", TextType.LINK, "https://www.boot.dev")
+        node10 = TextNode("This is a link node", TextType.LINK, "https://www.boot.dev")
+        self.assertEqual(node9, node10)
+        print("-Link: Passed")
+        node11 = TextNode("This is a image node", TextType.IMAGE, None)
+        node12 = TextNode("This is a image node", TextType.IMAGE, None)
+        self.assertEqual(node11,node12)
+        print("-Image: Passed")
+
+        print("TextNode 'Not Equals' Tests:")
+        self.assertNotEqual(node1, node3)
+        print("-Text, Bold: Passed")
+        self.assertNotEqual(node5, node7)
+        print("-Italic, Code: Passed")
+        self.assertNotEqual(node9, (TextNode("This is a link node", TextType.LINK, None)))
+        print("-Link, Broken Link: Passed")
+if __name__ == "__main__":
+    unittest.main()

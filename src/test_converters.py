@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode,TextType
-from converters import text_node_to_html_node
+from converters import text_node_to_html_node, text_to_textnodes
 
 class Test_TextNode_to_HTMLNode(unittest.TestCase):
     def test_text(self):
@@ -50,3 +50,19 @@ class Test_TextNode_to_HTMLNode(unittest.TestCase):
         print("TextNode to HTMLNode Tests:\n-Image(Failure):")
         node = TextNode("This is a image node that should fail", TextType.IMAGE)
         self.assertRaises(Exception, text_node_to_html_node, node)
+
+class Test_Text_to_TextNodes(unittest.TestCase):
+    def test_text_to_textnodes(self):
+        print("Text to TextNode:\n-Test One")
+        node = text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
+        self.assertListEqual([
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),], node)

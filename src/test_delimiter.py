@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode,TextType
-from delimiter import split_nodes_delimiter
+from delimiter import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 class Test_Split_Nodes_Delimiter(unittest.TestCase):
     def test_01(self):
@@ -63,3 +63,58 @@ class Test_Split_Nodes_Delimiter(unittest.TestCase):
                            TextNode(" with bad formating ", TextType.TEXT),
                            TextNode(" and should only be text nodes ", TextType.TEXT)]
         self.assertEqual(node_code, compare_results)
+
+class Test_Split_Nodes_ImgAndLink(unittest.TestCase):
+    def test_01(self):
+        print("Split Nodes:\n-Images Test 01")
+        node = TextNode(
+        "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+        TextType.TEXT,)
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual([
+            TextNode("This is text with an ", TextType.TEXT),
+            TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(" and another ", TextType.TEXT),
+            TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),],new_nodes,)
+        
+    def test_02(self):
+        print("Split Nodes:\n-Images Test 02(No Image)")
+        node = TextNode("This is a text with no images",TextType.TEXT)  
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual([TextNode("This is a text with no images",TextType.TEXT)], new_nodes)
+
+    def test_03(self):
+        print("Split Nodes:\n-Images & Link Test 01")
+        node = TextNode("This is a text node with an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](www.google.com)", TextType.TEXT)
+        image_nodes = split_nodes_image([node])
+        link_nodes = split_nodes_link(image_nodes)
+        self.assertListEqual([
+            TextNode("This is a text node with an ", TextType.TEXT),
+            TextNode("image",TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "www.google.com")
+        ], link_nodes)
+
+    def test_04(self):
+        print("Split Nodes:\n-Images, Links, and skipped nodes")
+        node = TextNode("This is a **Text** node with a ![image](https://i.imgur.com/zjjcJKZ.png), some _italic text_, and a [link](www.google.com)", TextType.TEXT)
+        imaged_nodes = split_nodes_image([node])
+        linked_nodes = split_nodes_link(imaged_nodes)
+        self.assertListEqual([
+            TextNode("This is a **Text** node with a ", TextType.TEXT),
+            TextNode("image",TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(", some _italic text_, and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "www.google.com")
+        ], linked_nodes)
+        print("-With Nodes")
+        bolded_nodes = split_nodes_delimiter(linked_nodes,"**", TextType.BOLD)
+        italiced_nodes = split_nodes_delimiter(bolded_nodes, "_", TextType.ITALIC)
+        self.assertListEqual([
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("Text", TextType.BOLD),
+            TextNode(" node with a ", TextType.TEXT),
+            TextNode("image",TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(", some ", TextType.TEXT),
+            TextNode("italic text", TextType.ITALIC),
+            TextNode(", and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "www.google.com")], italiced_nodes)

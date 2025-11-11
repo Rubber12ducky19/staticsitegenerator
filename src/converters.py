@@ -1,5 +1,6 @@
 from textnode import TextNode, TextType
 from htmlnode import LeafNode
+from delimiter import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 def text_node_to_html_node(text_node):
     #Should handle each type of TextType enum.  If gets a TextNode, that is none of those types, it should raise an Exception.
@@ -23,3 +24,13 @@ def text_node_to_html_node(text_node):
             else: raise Exception("TextNode Image has no url")
         case _:
             raise Exception("TextNode has no supported TextType enum")
+
+def text_to_textnodes(text):
+    #Should take a string of Markdown text and return a list of TextNodes objects.
+    first_node = [TextNode(text, TextType.TEXT),]
+    imaged_node = split_nodes_image(first_node)
+    linked_node = split_nodes_link(imaged_node)
+    bolded_node = split_nodes_delimiter(linked_node, "**", TextType.BOLD)
+    italiced_node = split_nodes_delimiter(bolded_node, "_", TextType.ITALIC)
+    coded_node = split_nodes_delimiter(italiced_node, "`", TextType.CODE)
+    return coded_node
